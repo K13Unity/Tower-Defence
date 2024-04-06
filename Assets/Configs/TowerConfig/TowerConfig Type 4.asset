@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17c2b2d01e766d141ad23835e84c6ae9, type: 3}
+  m_Name: TowerConfig Type 4
+  m_EditorClassIdentifier: 
+  prefab:
+  - {fileID: 6306566222344783135, guid: a18a24d6783782b468b95d1d48e46575, type: 3}
+  - {fileID: 3954048849246684111, guid: bdece79d62ccdad4c810c11a8fe0c5c2, type: 3}
+  - {fileID: 5195633260558110016, guid: daebe18d6b8423048be3b66c7ab7f0d9, type: 3}
+  - {fileID: 2831256934595453116, guid: 52ad9458b528a3545871d42a584fd415, type: 3}
+  - {fileID: 1707355550715978988, guid: ff42a555615102d4fb7c4186d9c48ef1, type: 3}
+  _towerData:
+  - _damage: 130
+    _attackSpeed: 1
+    _createDamage: 5
+    _createChance: 40
+    _damageMultiplier: 1.2
+    _attackSpeedMultiplier: 1.2
+    _createChanceMultiplier: 1.2
+  - _damage: 330
+    _attackSpeed: 1.5
+    _createDamage: 5
+    _createChance: 45
+    _damageMultiplier: 1.5
+    _attackSpeedMultiplier: 1.2
+    _createChanceMultiplier: 1.2
+  - _damage: 990
+    _attackSpeed: 2
+    _createDamage: 6
+    _createChance: 50
+    _damageMultiplier: 1.7
+    _attackSpeedMultiplier: 1.3
+    _createChanceMultiplier: 1.2
+  - _damage: 1900
+    _attackSpeed: 2.5
+    _createDamage: 6
+    _createChance: 55
+    _damageMultiplier: 1.9
+    _attackSpeedMultiplier: 1.4
+    _createChanceMultiplier: 1.2
+  - _damage: 3600
+    _attackSpeed: 3
+    _createDamage: 6
+    _createChance: 60
+    _damageMultiplier: 2.1
+    _attackSpeedMultiplier: 1.5
+    _createChanceMultiplier: 1.2
+  _towerType: 3

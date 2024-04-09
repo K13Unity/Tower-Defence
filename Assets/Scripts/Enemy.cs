@@ -2,17 +2,21 @@ using Assets.Scripts;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.EventSystems.EventTrigger;
 
 public class Enemy : MonoBehaviour
 {
     public Transform _currentTargetPosition {  get; private set; }
     private List<Transform> _wayPoints = new List<Transform>();
     private DamageDisplay _damageDisplay;
+  
     private float _arrived = 0.1f;
     private float _turnSpeed = 5f;
+    private float _distance;
     public float _speed;
     public int _health;
     public int _coins;
+    public int counter = -1;
 
     public event Action<Enemy> OnEnemyDie;
 
@@ -35,22 +39,26 @@ public class Enemy : MonoBehaviour
 
     void Update()
     {
-        var direction = (_currentTargetPosition.position - transform.position).normalized;
-        var distance = Vector3.Distance(transform.position, _currentTargetPosition.position);
+        var direction = (_currentTargetPosition.transform.position - transform.position).normalized;
+        _distance = Vector3.Distance(transform.position, _currentTargetPosition.transform.position);
         
-        if (distance > _arrived)
+        if (_distance > _arrived)
         {
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), _turnSpeed * Time.deltaTime);
             transform.position += direction * _speed  * Time.deltaTime;
         }
         else
         {
-            transform.position = _currentTargetPosition.position;
+            transform.position = _currentTargetPosition.transform.position;
             int _nextIndex = _wayPoints.IndexOf(_currentTargetPosition);
             _nextIndex = (_nextIndex + 1);
+            if(counter +1 < 4) counter++; 
             _currentTargetPosition = _wayPoints[_nextIndex];
         }
     }
+
+   
+   
 
     public void TakeDamage(int damage, bool isCritical)
     {

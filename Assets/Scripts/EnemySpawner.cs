@@ -1,5 +1,6 @@
 using Assets.Scripts;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
@@ -7,7 +8,6 @@ public class EnemySpawner : MonoBehaviour
     public static EnemySpawner Instance { get; private set; }
 
     [SerializeField] private TimeManagerWave timeManagerWave;
-    [SerializeField] private TriggerEnemy _triggerEnemy;
     [SerializeField] private CoinManager _coinManager;
     [SerializeField] private DamageDisplay _damageDisplay;
     [SerializeField] private EnemyConfig _enemyConfig;
@@ -30,7 +30,7 @@ public class EnemySpawner : MonoBehaviour
     private bool _isSpawning = false;
     private int _enemyCounter = 0;
 
-    public Queue<Enemy> EnemyQueue = new Queue<Enemy>();
+    public List<Enemy> EnemyList = new List<Enemy>();
 
 
 
@@ -45,6 +45,7 @@ public class EnemySpawner : MonoBehaviour
 
     void Update()
     {
+        ClosestEnnemy();
         if (_isSpawning)
         {
             _intervalTime += Time.deltaTime;
@@ -72,10 +73,54 @@ public class EnemySpawner : MonoBehaviour
 
         }
         enemy.Die();
-        if (EnemyQueue.Count > 0)
+        if (EnemyList.Count > 0)
         {
-            EnemyQueue.Dequeue();
+            EnemyList.Remove(enemy);
         }
+    }
+
+    private Enemy GetClosestEnemy(List<Enemy> enemys, Transform target)
+    {
+        float closestDistance = Mathf.Infinity;
+        Enemy closestEnemy = null;
+
+        foreach (var enemy in enemys)
+        {
+            var distance = Vector3.Distance(enemy.transform.position, target.position);
+            if (distance < closestDistance)
+            {
+                closestDistance = distance;
+                closestEnemy = enemy;
+            }
+        }
+        return closestEnemy;
+    }
+
+    private void ClosestEnnemy()
+    {
+        if(EnemyList.Count == 0)
+        {
+            return;
+        }
+        var maxCounter = EnemyList.Max(enemy => enemy.counter);
+        var enemys = EnemyList.FindAll(enemy => enemy.counter == maxCounter);
+        if (enemys.Count > 0)
+        {
+            var enemy = GetClosestEnemy(enemys, _wayPoints[maxCounter + 1]);
+            if(enemy != EnemyList[0])
+            {
+                ReplaceEnemy(enemy);
+                return;
+            }
+        }
+    }
+
+    private void ReplaceEnemy(Enemy enemy)
+    {
+        Debug.Log(EnemyList.IndexOf(enemy));
+        EnemyList.Remove(enemy);
+        EnemyList.Insert(0, enemy);
+        Debug.Log(EnemyList.IndexOf(enemy));
     }
 
     private void OnEnable()
@@ -86,9 +131,9 @@ public class EnemySpawner : MonoBehaviour
 
     private void OnDisable()
     {
-        while (EnemyQueue.Count > 0)
+        for (int i = 0; i < EnemyList.Count; i++)
         {
-            EnemyQueue.Dequeue().OnEnemyDie -= OnEnemyDeath;
+            EnemyList[i].OnEnemyDie -= OnEnemyDeath;
         }
         timeManagerWave.onWaveStart -= OnWaveStart;
         timeManagerWave.onWaveEnd -= OnWaveEnd;
@@ -116,7 +161,7 @@ public class EnemySpawner : MonoBehaviour
         _enemy.Init(_enemyData, _damageDisplay);
         _enemy.transform.position = transform.position;
         _enemy.SetWay(_wayPoints);
-       // EnemyQueue.Add(_enemy);
+        EnemyList.Add(_enemy);
         _enemy.OnEnemyDie += OnEnemyDeath;
         _enemy.OnEnemyDie += _coinManager.OnEnemyDeath;
     }
@@ -131,7 +176,7 @@ public class EnemySpawner : MonoBehaviour
         _enemy.Init(_miniBossData, _damageDisplay);
         _enemy.transform.position = transform.position;
         _enemy.SetWay(_wayPoints);
-       // EnemyQueue.Add(_enemy);
+        EnemyList.Add(_enemy);
         _enemy.OnEnemyDie += OnEnemyDeath;
         _enemy.OnEnemyDie += _coinManager.OnEnemyDeath;
         _miniBoss = _enemy;
@@ -144,7 +189,7 @@ public class EnemySpawner : MonoBehaviour
         _enemyBoss.Init(_bossData, _damageDisplay);
         _enemyBoss.transform.position = transform.position;
         _enemyBoss.SetWay(_wayPoints);
-        //EnemyQueue.Add(_enemyBoss);
+        EnemyList.Add(_enemyBoss);
         _enemyBoss.OnEnemyDie += OnEnemyDeath;
         _enemyBoss.OnEnemyDie += _coinManager.OnEnemyDeath;
         _boss = _enemyBoss;
@@ -169,11 +214,11 @@ public class EnemySpawner : MonoBehaviour
     private void OnWaveEnd()
     {
         StopSpawning();
-        foreach (Enemy enemy in EnemyQueue)
+        foreach (Enemy enemy in EnemyList)
         {
             enemy.Die(); 
         }
-        EnemyQueue.Clear();
+        EnemyList.Clear();
         CreateBoss();
     }
     

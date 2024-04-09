@@ -29,7 +29,7 @@ public class Tower : MonoBehaviour
     {
         LookTowardsEnemy();
         _timeSinceLastShot += Time.deltaTime;
-        if (EnemySpawner.Instance.EnemyQueue.Count > 0)
+        if (EnemySpawner.Instance.EnemyList.Count > 0)
         {
             ShotTimeInterval();
         }
@@ -49,7 +49,7 @@ public class Tower : MonoBehaviour
         _animator.SetTrigger("isShot");
         _animator.SetFloat("SpeedMultiplier",  attackSpeed);
         await UniTask.Delay(_shotDelay);
-        if (EnemySpawner.Instance.EnemyQueue.Count > 0)
+        if (EnemySpawner.Instance.EnemyList.Count > 0)
         {
             Shot();
         }
@@ -57,34 +57,32 @@ public class Tower : MonoBehaviour
 
     private void Shot()
     {
-        if (EnemySpawner.Instance.EnemyQueue.Count > 0)
+        if (EnemySpawner.Instance.EnemyList.Count > 0)
         {
-            Enemy targetEnemy = EnemySpawner.Instance.EnemyQueue.Peek();
+            Enemy targetEnemy = EnemySpawner.Instance.EnemyList[0];
             if (targetEnemy != null)
             {
-
                 var bullet = Instantiate(_bulletPrefab);
-            if(_firePoint != null)
-            {
-                bullet.transform.position = _firePoint.transform.position;
-                bullet.transform.rotation = _firePoint.transform.rotation;
-                bullet.Initialize(EnemySpawner.Instance.EnemyQueue.Peek(), damage, createDamage, creatChance);
+                if(_firePoint != null)
+                {
+                    bullet.transform.position = _firePoint.transform.position;
+                    bullet.transform.rotation = _firePoint.transform.rotation;
+                    bullet.Initialize(targetEnemy, damage, createDamage, creatChance);
+                }
+                else
+                {
+                    Destroy(bullet.gameObject);
+                }
             }
-            else
-            {
-                Destroy(bullet.gameObject);
-            }
-            }
-           
         }
     }
 
     private void LookTowardsEnemy()
     {
 
-        if (EnemySpawner.Instance.EnemyQueue.Count > 0 && EnemySpawner.Instance.EnemyQueue.Peek() != null)
+        if (EnemySpawner.Instance.EnemyList.Count > 0 && EnemySpawner.Instance.EnemyList[0] != null)
         {
-            transform.LookAt(EnemySpawner.Instance.EnemyQueue.Peek().transform.position);
+            transform.LookAt(EnemySpawner.Instance.EnemyList[0].transform.position);
         }
     }
 
@@ -109,22 +107,5 @@ public class Tower : MonoBehaviour
             _animator.SetFloat("SpeedMultiplier", attackSpeed);
         }
         _shotDelay = Mathf.RoundToInt(_shotDelay / _towerData.AttackSpeedMultiplier);
-    }
-    private void OnEnable()
-    {
-        TriggerEnemy.OnEnemyTrigger += UpdateEnemyQueue;
-    }
-
-    private void UpdateEnemyQueue(Enemy enemy)
-    {
-        if (!EnemySpawner.Instance.EnemyQueue.Contains(enemy))
-        {
-            EnemySpawner.Instance.EnemyQueue.Enqueue(enemy);
-        }
-    }
-
-    private void OnDisable()
-    {
-        TriggerEnemy.OnEnemyTrigger -= UpdateEnemyQueue;
     }
 }
